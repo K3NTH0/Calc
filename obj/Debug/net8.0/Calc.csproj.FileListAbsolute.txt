@@ -1,0 +1,14 @@
+/home/ken/DevPerso/Calc/bin/Debug/net8.0/Calc
+/home/ken/DevPerso/Calc/bin/Debug/net8.0/Calc.deps.json
+/home/ken/DevPerso/Calc/bin/Debug/net8.0/Calc.runtimeconfig.json
+/home/ken/DevPerso/Calc/bin/Debug/net8.0/Calc.dll
+/home/ken/DevPerso/Calc/bin/Debug/net8.0/Calc.pdb
+/home/ken/DevPerso/Calc/obj/Debug/net8.0/Calc.GeneratedMSBuildEditorConfig.editorconfig
+/home/ken/DevPerso/Calc/obj/Debug/net8.0/Calc.AssemblyInfoInputs.cache
+/home/ken/DevPerso/Calc/obj/Debug/net8.0/Calc.AssemblyInfo.cs
+/home/ken/DevPerso/Calc/obj/Debug/net8.0/Calc.csproj.CoreCompileInputs.cache
+/home/ken/DevPerso/Calc/obj/Debug/net8.0/Calc.dll
+/home/ken/DevPerso/Calc/obj/Debug/net8.0/refint/Calc.dll
+/home/ken/DevPerso/Calc/obj/Debug/net8.0/Calc.pdb
+/home/ken/DevPerso/Calc/obj/Debug/net8.0/Calc.genruntimeconfig.cache
+/home/ken/DevPerso/Calc/obj/Debug/net8.0/ref/Calc.dll
