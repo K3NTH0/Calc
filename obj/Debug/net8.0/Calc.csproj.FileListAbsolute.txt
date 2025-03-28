@@ -12,3 +12,4 @@
 /home/ken/DevPerso/Calc/obj/Debug/net8.0/Calc.pdb
 /home/ken/DevPerso/Calc/obj/Debug/net8.0/Calc.genruntimeconfig.cache
 /home/ken/DevPerso/Calc/obj/Debug/net8.0/ref/Calc.dll
+/home/ken/DevPerso/Calc/obj/Debug/net8.0/Calc.sourcelink.json

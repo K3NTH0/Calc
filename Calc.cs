@@ -5,6 +5,10 @@ namespace Calc
 {
     class Program
     {
+        // Constantes de classe
+        private const string OPERATIONS_VALIDES = "+-*/^";
+        private const string EXPOSANTS = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+
         static void Main(string[] args)
         {
             // Variables 
@@ -13,8 +17,6 @@ namespace Calc
             char signe;
             string? entreeUtilisateur;
 
-            // Constantes 
-            const string OPERATIONS_VALIDES = "+-*/";
             CultureInfo cultureFr = new CultureInfo("fr-FR");
             // Création d'une culture personnalisée qui accepte à la fois le point et la virgule
             NumberFormatInfo formatPersonnalise = new NumberFormatInfo
@@ -42,7 +44,7 @@ namespace Calc
                 int indexSigne = RechercherSigneOperation(entreeUtilisateur, OPERATIONS_VALIDES);
                 if (indexSigne == -1)
                 {
-                    Console.WriteLine("Opération non valide. Utilisez +, -, * ou /");
+                    Console.WriteLine("Opération non valide. Utilisez +, -, *, /, ^ ou un exposant (⁰¹²³⁴⁵⁶⁷⁸⁹)");
                     continue;
                 }
 
@@ -67,8 +69,8 @@ namespace Calc
         {
             Console.WriteLine("Calculatrice");
             Console.WriteLine("Entrez votre calcul sous la forme: <nombre1><opération><nombre2>");
-            Console.WriteLine("Opérations disponibles: +, -, *, /");
-            Console.WriteLine("Exemple: 5,3+2,1, -5,3+2,1, 5,3+-2,1, -5,3+-2,1");
+            Console.WriteLine("Opérations disponibles: +, -, *, /, ^ (exposant)");
+            Console.WriteLine("Exemple: 5,3+2,1, -5,3+2,1, 5,3+-2,1, -5,3+-2,1, 2^3, 48⁷, 2⁵+3, 2+3⁴, 2⁵*3⁴");
         }
 
         static void AfficherInvite()
@@ -81,29 +83,41 @@ namespace Calc
             string? entree = Console.ReadLine()?.Trim();
             while (string.IsNullOrEmpty(entree))
             {
-                Console.WriteLine("Veuillez entrer une expression valide (ex: 5,3+2,1 ou -5,3+2,1)");
+                Console.WriteLine("Veuillez entrer une expression valide (ex: 5,3+2,1 ou -5,3+2,1 ou 2^3 ou 48⁷ ou 2⁵+3)");
             }
             return entree;
         }
 
         static int RechercherSigneOperation(string expression, string operationsValides)
         {
-            // On commence à 1 pour éviter de confondre le signe négatif du premier nombre
-            for (int i = 1; i < expression.Length; i++)
+            // On commence à 0 pour trouver tous les signes d'opération
+            for (int i = 0; i < expression.Length; i++)
             {
                 if (operationsValides.Contains(expression[i]))
                 {
                     // Si on trouve un signe négatif, on vérifie qu'il n'est pas suivi d'un chiffre
                     if (expression[i] == '-')
                     {
-                        // Si le caractère précédent est un chiffre ou une virgule, c'est une soustraction
-                        if (i > 0 && (char.IsDigit(expression[i - 1]) || expression[i - 1] == ',' || expression[i - 1] == '.'))
+                        // Si c'est le premier caractère ou si le caractère précédent est un chiffre, une virgule ou un exposant, c'est une soustraction
+                        if (i == 0 || (i > 0 && (char.IsDigit(expression[i - 1]) || expression[i - 1] == ',' || expression[i - 1] == '.' || EXPOSANTS.Contains(expression[i - 1]))))
                         {
                             return i;
                         }
                         // Sinon, c'est un nombre négatif, on continue la recherche
                         continue;
                     }
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        static int RechercherExposantUnicode(string expression)
+        {
+            for (int i = 0; i < expression.Length; i++)
+            {
+                if (EXPOSANTS.Contains(expression[i]))
+                {
                     return i;
                 }
             }
@@ -122,15 +136,66 @@ namespace Calc
             string nombre1Str = entree.Substring(0, indexSigne);
             string nombre2Str = entree.Substring(indexSigne + 1);
 
-            // Remplacement des points par des virgules pour la conversion
-            nombre1Str = nombre1Str.Replace('.', ',');
-            nombre2Str = nombre2Str.Replace('.', ',');
-
-            if (!double.TryParse(nombre1Str, NumberStyles.Any, format, out nombre1) || 
-                !double.TryParse(nombre2Str, NumberStyles.Any, format, out nombre2))
+            // Vérifier si le premier nombre contient un exposant
+            int indexExposant1 = RechercherExposantUnicode(nombre1Str);
+            if (indexExposant1 != -1)
             {
-                Console.WriteLine("Les nombres doivent être valides (utilisez la virgule ou le point pour les décimaux)");
-                return false;
+                char exposantUnicode = nombre1Str[indexExposant1];
+                int exposant = EXPOSANTS.IndexOf(exposantUnicode);
+                if (exposant != -1)
+                {
+                    string base1Str = nombre1Str.Substring(0, indexExposant1);
+                    base1Str = base1Str.Replace('.', ',');
+                    if (double.TryParse(base1Str, NumberStyles.Any, format, out double base1))
+                    {
+                        nombre1 = CalculerResultat('^', base1, exposant);
+                    }
+                }
+            }
+            else
+            {
+                nombre1Str = nombre1Str.Replace('.', ',');
+                if (!double.TryParse(nombre1Str, NumberStyles.Any, format, out nombre1))
+                {
+                    Console.WriteLine("Le premier nombre doit être valide (utilisez la virgule ou le point pour les décimaux)");
+                    return false;
+                }
+            }
+
+            // Vérifier si le deuxième nombre contient un exposant
+            int indexExposant2 = RechercherExposantUnicode(nombre2Str);
+            if (indexExposant2 != -1)
+            {
+                char exposantUnicode = nombre2Str[indexExposant2];
+                int exposant = EXPOSANTS.IndexOf(exposantUnicode);
+                if (exposant != -1)
+                {
+                    string base2Str = nombre2Str.Substring(0, indexExposant2);
+                    base2Str = base2Str.Replace('.', ',');
+                    if (double.TryParse(base2Str, NumberStyles.Any, format, out double base2))
+                    {
+                        nombre2 = CalculerResultat('^', base2, exposant);
+                    }
+                }
+            }
+            else
+            {
+                nombre2Str = nombre2Str.Replace('.', ',');
+                if (!double.TryParse(nombre2Str, NumberStyles.Any, format, out nombre2))
+                {
+                    Console.WriteLine("Le deuxième nombre doit être valide (utilisez la virgule ou le point pour les décimaux)");
+                    return false;
+                }
+            }
+
+            // Gérer les nombres négatifs
+            if (nombre1Str.StartsWith("-"))
+            {
+                nombre1 = -Math.Abs(nombre1);
+            }
+            if (nombre2Str.StartsWith("-"))
+            {
+                nombre2 = -Math.Abs(nombre2);
             }
 
             return true;
@@ -153,6 +218,8 @@ namespace Calc
                         return double.NaN;
                     }
                     return Division(nombre1, nombre2);
+                case '^':
+                    return Puissance(nombre1, nombre2);
                 default:
                     return double.NaN;
             }
@@ -172,6 +239,10 @@ namespace Calc
 
         static double Division(double nbr1, double nbr2){
             return nbr1 / nbr2;
+        }
+
+        static double Puissance(double nbr1, double nbr2){
+            return Math.Pow(nbr1, nbr2);
         }
     }
 }
